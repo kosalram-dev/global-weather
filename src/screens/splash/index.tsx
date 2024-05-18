@@ -1,14 +1,10 @@
 import React, {FunctionComponent, useEffect} from 'react';
-import {View, Text} from 'react-native';
 import {CommonActions, useNavigation} from '@react-navigation/native';
 
-import useTheme from '../../hooks/useTheme';
-import createStyles from './styles';
 import {ROUTES} from '../../helpers/constants';
+import {Text, View} from '../../components/rn-styled';
 
 const Splash: FunctionComponent = () => {
-  const {colors} = useTheme();
-  const styles = createStyles(colors);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -18,8 +14,8 @@ const Splash: FunctionComponent = () => {
   }, [navigation]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Global</Text>
+    <View className="flex-1 items-center justify-center bg-white">
+      <Text className="font-semibold text-primary text-xl">Global</Text>
     </View>
   );
 };
