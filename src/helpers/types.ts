@@ -143,3 +143,11 @@ export type Location = {
   localtime_epoch: number;
   localtime: string;
 };
+
+export type TInfoChip = {
+  id: number;
+  image: any;
+  title: string;
+  key: keyof Current;
+  unit: string;
+};

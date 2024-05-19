@@ -1,3 +1,5 @@
+import ForecastTile from './forecast-tile';
 import Header from './header';
+import InfoChip from './info-chip';
 
-export {Header};
+export {Header, InfoChip, ForecastTile};

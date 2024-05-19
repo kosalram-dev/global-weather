@@ -4,7 +4,8 @@ import Config from 'react-native-config';
 import {ENDPOINTS} from '../helpers/constants';
 import {Weather} from '../helpers/types';
 
-export const DEFAULT_FORECAST_DAY = 1;
+export const DEFAULT_FORECAST_DAY = 2;
+export const DEFAULT_FORECAST_HOUR = 5;
 
 const useWeather = (query: string) => {
   const [data, setData] = useState<Weather | null>(null);
@@ -16,7 +17,6 @@ const useWeather = (query: string) => {
       .then(res => res.json())
       .then(result => {
         setData(result);
-        // console.log('+=====result=====', result);
       })
       .catch(error => {
         console.log('+=====error=====', error);
