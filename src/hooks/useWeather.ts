@@ -10,13 +10,16 @@ export const DEFAULT_FORECAST_HOUR = 5;
 export const DEFAULT_LOCATION = 'Chicago';
 
 const useWeather = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [data, setData] = useState<Weather | null>(null);
 
   const getWeatherForecast = useCallback(async (query: string) => {
+    setLoading(true);
     const result = await apiCall(
       `${Config.BASE_URL}${ENDPOINTS.GET_WEATHER_FORECAST}?q=${query}&days=${DEFAULT_FORECAST_DAY}&key=${Config.WEATHER_API_KEY}`,
     );
     setData(result);
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -25,6 +28,7 @@ const useWeather = () => {
 
   return {
     ...data,
+    loading,
     getWeatherForecast,
   };
 };

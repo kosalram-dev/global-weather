@@ -25,7 +25,7 @@ describe('<Splash />', () => {
     );
 
     // Should display the "Global" text
-    expect(getByText('Global')).toBeTruthy();
+    expect(getByText('1Global')).toBeTruthy();
 
     // Fast-forward time
     jest.advanceTimersByTime(2000);

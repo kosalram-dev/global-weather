@@ -1,5 +1,5 @@
 import React, {FunctionComponent, useCallback, useState} from 'react';
-import {ImageSourcePropType, StatusBar} from 'react-native';
+import {ActivityIndicator, ImageSourcePropType, StatusBar} from 'react-native';
 
 import {Header, InfoChip, ForecastTile} from '../../components';
 import {
@@ -49,18 +49,15 @@ const infoChips: TInfoChip[] = [
 ];
 
 const getBackgroundImage = (value?: string): ImageSourcePropType => {
-  if (value) {
+  if (value && value.toLowerCase().includes('rain')) {
+    value = 'rain';
+  } else if (value) {
     value = value.toLowerCase();
   }
   switch (value) {
     case 'overcast':
     case 'partly cloudy':
       return CloudSky as ImageSourcePropType;
-    case 'moderate rain at times':
-    case 'mist':
-    case 'light rain':
-    case 'light rain shower':
-    case 'patchy rain nearby':
     case 'rain':
       return Rain as ImageSourcePropType;
     case 'clear':
@@ -75,7 +72,8 @@ const Home: FunctionComponent = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const {location, current, forecast, getWeatherForecast} = useWeather();
+  const {location, current, forecast, getWeatherForecast, loading} =
+    useWeather();
   const {locations, reset: resetLocations} = useLocation(debouncedSearchTerm);
 
   const handleLocation = (data: TLocation) => {
@@ -122,98 +120,105 @@ const Home: FunctionComponent = () => {
       blurRadius={90}
       source={getBackgroundImage(current?.condition.text)}
       className="flex-1 relative">
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
       <Image
+        blurRadius={loading ? 90 : 0}
         source={getBackgroundImage(current?.condition.text)}
         className="absolute w-full h-2/3 rounded-[30px]"
       />
-      <SafeAreaView className="flex-1 flex-col">
-        <View className="h-2/3">
-          <View className="mx-4">
-            <Header
-              handleSearch={handleSearch}
-              toggleSearch={toggleSearch}
-              setToggleSearch={setToggleSearch}
-            />
-          </View>
-          {current && (
-            <View className={'flex-1 items-center'}>
-              <View className="items-center justify-between h-20 w-full flex-row px-4">
-                <View className="flex-1 items-center justify-center">
-                  <Text className="text-xl font-bold text-black text-center">
-                    {location?.name}
-                  </Text>
-                  <Text className="text-xs font-normal text-black text-center">
-                    {location?.country}
-                  </Text>
-                </View>
-              </View>
-              <View className="flex-1 items-center justify-center">
-                <Text className="font-medium text-black text-6xl align-middle text-center">
-                  {`${roundOff(current.temp_c)} °C`}
-                </Text>
-              </View>
-              <View className="flex-1 items-center">
-                <Image
-                  source={{uri: `https:${current.condition.icon}`}}
-                  className="w-12 h-12"
-                  resizeMode="contain"
-                  resizeMethod="resize"
-                />
-                <Text className="font-normal capitalize text-black text-md">
-                  {`${current.condition.text}`}
-                </Text>
-                <View className="h-[0.5px] w-12 rounded-full bg-black my-2" />
-                <Text className="font-normal capitalize text-black text-md">
-                  {getMaxAndMinTempOfDay()}
-                </Text>
-              </View>
-              <View className="flex-1 flex-col items-center justify-center">
-                <View className="items-center justify-evenly flex-row w-full pb-8">
-                  {current &&
-                    infoChips.map((infoChip: TInfoChip) => (
-                      <InfoChip
-                        key={`info_chip_${infoChip.id}`}
-                        data={infoChip}
-                        current={current}
-                      />
-                    ))}
-                </View>
-                <View className="h-1 w-6 rounded-full bg-black" />
-              </View>
-            </View>
-          )}
-          {toggleSearch && locations && locations.length > 0 && (
-            <LocationSelector
-              locations={locations}
-              handleLocation={handleLocation}
-            />
-          )}
+      {loading ? (
+        <View className="flex-1 bg-[#ffffff99] items-center justify-center">
+          <ActivityIndicator size="large" />
         </View>
-        <View className="h-1/3 flex-col items-center justify-center">
-          <View className="flex-1 items-center justify-center">
-            {location && location.localtime_epoch && (
-              <Text className="font-semibold text-black text-lg align-middle text-center">
-                {formatDate(location.localtime_epoch, location.tz_id)}
-              </Text>
+      ) : (
+        <SafeAreaView className="flex-1 flex-col">
+          <View className="h-2/3">
+            <View className="mx-4">
+              <Header
+                handleSearch={handleSearch}
+                toggleSearch={toggleSearch}
+                setToggleSearch={setToggleSearch}
+              />
+            </View>
+            {current && (
+              <View className={'flex-1 items-center'}>
+                <View className="items-center justify-between h-20 w-full flex-row px-4">
+                  <View className="flex-1 items-center justify-center">
+                    <Text className="text-xl font-bold text-black text-center">
+                      {location?.name}
+                    </Text>
+                    <Text className="text-xs font-normal text-black text-center">
+                      {location?.country}
+                    </Text>
+                  </View>
+                </View>
+                <View className="flex-1 items-center justify-center">
+                  <Text className="font-medium text-black text-6xl align-middle text-center">
+                    {`${roundOff(current.temp_c)} °C`}
+                  </Text>
+                </View>
+                <View className="flex-1 items-center">
+                  <Image
+                    source={{uri: `https:${current.condition.icon}`}}
+                    className="w-12 h-12"
+                    resizeMode="contain"
+                    resizeMethod="resize"
+                  />
+                  <Text className="font-normal capitalize text-black text-md">
+                    {`${current.condition.text}`}
+                  </Text>
+                  <View className="h-[0.5px] w-12 rounded-full bg-black my-2" />
+                  <Text className="font-normal capitalize text-black text-md">
+                    {getMaxAndMinTempOfDay()}
+                  </Text>
+                </View>
+                <View className="flex-1 flex-col items-center justify-center">
+                  <View className="items-center justify-evenly flex-row w-full pb-8">
+                    {current &&
+                      infoChips.map((infoChip: TInfoChip) => (
+                        <InfoChip
+                          key={`info_chip_${infoChip.id}`}
+                          data={infoChip}
+                          current={current}
+                        />
+                      ))}
+                  </View>
+                  <View className="h-1 w-6 rounded-full bg-black" />
+                </View>
+              </View>
+            )}
+            {toggleSearch && locations && locations.length > 0 && (
+              <LocationSelector
+                locations={locations}
+                handleLocation={handleLocation}
+              />
             )}
           </View>
-          {location && forecast && forecast.forecastday.length > 0 && (
-            <>
-              <Text className="text-sm">5-hour forecast</Text>
-              <View className="flex-1 flex-row items-center justify-evenly">
-                {getForecastHours().map(hour => (
-                  <ForecastTile
-                    key={`hour_${hour.time_epoch}`}
-                    hour={hour}
-                    timezone={location.tz_id}
-                  />
-                ))}
-              </View>
-            </>
-          )}
-        </View>
-      </SafeAreaView>
+          <View className="h-1/3 flex-col items-center justify-center">
+            <View className="flex-1 items-center justify-center">
+              {location && location.localtime_epoch && (
+                <Text className="font-semibold text-black text-lg align-middle text-center">
+                  {formatDate(location.localtime_epoch, location.tz_id)}
+                </Text>
+              )}
+            </View>
+            {location && forecast && forecast.forecastday.length > 0 && (
+              <>
+                <Text className="text-sm">5-hour forecast</Text>
+                <View className="flex-1 flex-row items-center justify-evenly">
+                  {getForecastHours().map(hour => (
+                    <ForecastTile
+                      key={`hour_${hour.time_epoch}`}
+                      hour={hour}
+                      timezone={location.tz_id}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
+          </View>
+        </SafeAreaView>
+      )}
     </ImageBackground>
   );
 };
