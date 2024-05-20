@@ -3,6 +3,7 @@ import React, {FunctionComponent} from 'react';
 import {Image, Text, View} from '../rn-styled';
 import {Hour} from '../../helpers/types';
 import {formatTime} from '../../helpers/datetime-formatter';
+import {TEST_IDS} from '../../helpers/constants';
 
 type ForecastTileProps = {
   hour: Hour;
@@ -23,6 +24,7 @@ const ForecastTile: FunctionComponent<ForecastTileProps> = ({
         className="w-12 h-12"
         resizeMode="contain"
         resizeMethod="resize"
+        testID={TEST_IDS.FORECAST_ICON}
       />
       <Text className="text-xs">{formatTime(hour.time_epoch, timezone)}</Text>
     </View>

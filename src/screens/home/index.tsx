@@ -1,5 +1,5 @@
 import React, {FunctionComponent, useCallback, useState} from 'react';
-import {StatusBar} from 'react-native';
+import {ImageSourcePropType, StatusBar} from 'react-native';
 
 import {Header, InfoChip, ForecastTile} from '../../components';
 import {
@@ -48,25 +48,25 @@ const infoChips: TInfoChip[] = [
   },
 ];
 
-const getBackgroundImage = (value?: string) => {
+const getBackgroundImage = (value?: string): ImageSourcePropType => {
   if (value) {
     value = value.toLowerCase();
   }
   switch (value) {
     case 'overcast':
     case 'partly cloudy':
-      return CloudSky;
+      return CloudSky as ImageSourcePropType;
     case 'moderate rain at times':
     case 'mist':
     case 'light rain':
     case 'light rain shower':
     case 'patchy rain nearby':
     case 'rain':
-      return Rain;
+      return Rain as ImageSourcePropType;
     case 'clear':
     case 'sunny':
     default:
-      return ClearSky;
+      return ClearSky as ImageSourcePropType;
   }
 };
 
