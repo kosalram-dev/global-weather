@@ -1,5 +1,10 @@
 # Getting Started
 
+## Demo
+
+https://github.com/kosalram-dev/global-weather/assets/44052692/7f4a36b7-5e13-4c76-b23d-56c9705e8ce2
+
+
 ## Prerequisite
 
 1. Clone the repository using the following command
