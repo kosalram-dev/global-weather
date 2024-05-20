@@ -6,9 +6,13 @@ import {formatTime} from '../../helpers/datetime-formatter';
 
 type ForecastTileProps = {
   hour: Hour;
+  timezone: string;
 };
 
-const ForecastTile: FunctionComponent<ForecastTileProps> = ({hour}) => {
+const ForecastTile: FunctionComponent<ForecastTileProps> = ({
+  hour,
+  timezone,
+}) => {
   return (
     <View
       key={`hour_${hour.time_epoch}`}
@@ -20,7 +24,7 @@ const ForecastTile: FunctionComponent<ForecastTileProps> = ({hour}) => {
         resizeMode="contain"
         resizeMethod="resize"
       />
-      <Text className="text-xs">{formatTime(hour.time_epoch)}</Text>
+      <Text className="text-xs">{formatTime(hour.time_epoch, timezone)}</Text>
     </View>
   );
 };

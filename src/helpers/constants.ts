@@ -5,4 +5,5 @@ export const ROUTES = {
 
 export const ENDPOINTS = {
   GET_WEATHER_FORECAST: 'forecast.json',
+  GET_LOCATIONS: 'search.json',
 };

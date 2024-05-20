@@ -1,30 +1,37 @@
 import React, {FunctionComponent} from 'react';
-import {PlusIcon, Bars3BottomRightIcon} from 'react-native-heroicons/solid';
 
-import {Text, View} from '../rn-styled';
+import {TouchableOpacity, View, TextInput} from '../rn-styled';
+import {MagnifyingGlassIcon} from 'react-native-heroicons/solid';
 
 type HeaderProps = {
-  title?: string;
-  subtitle?: string;
+  handleSearch: (value: string) => void;
+  toggleSearch: boolean;
+  setToggleSearch: (val: boolean) => void;
 };
 
-const Header: FunctionComponent<HeaderProps> = ({title, subtitle}) => {
+const Header: FunctionComponent<HeaderProps> = ({
+  handleSearch,
+  toggleSearch,
+  setToggleSearch,
+}) => {
   return (
-    <View className="items-center justify-between h-20 w-full flex-row px-4">
-      <PlusIcon color="black" />
-      <View className="flex-1 items-center justify-center">
-        {title && (
-          <Text className="text-xl font-bold text-black text-center">
-            {title}
-          </Text>
-        )}
-        {subtitle && (
-          <Text className="text-xs font-normal text-black text-center">
-            {subtitle}
-          </Text>
-        )}
-      </View>
-      <Bars3BottomRightIcon color="black" />
+    <View
+      className={`flex-row justify-end items-center rounded-full ${
+        toggleSearch ? 'bg-[#ffffff]' : 'bg-transparent'
+      }`}>
+      {toggleSearch ? (
+        <TextInput
+          onChangeText={handleSearch}
+          placeholder="Search City"
+          placeholderTextColor="black"
+          className="pl-6 h-10 pb-1 flex-1 text-base text-black"
+        />
+      ) : null}
+      <TouchableOpacity
+        onPress={() => setToggleSearch(!toggleSearch)}
+        className="rounded-full p-3 m-1">
+        <MagnifyingGlassIcon color="black" />
+      </TouchableOpacity>
     </View>
   );
 };

@@ -1,35 +1,26 @@
-export const formatTime = (timestamp: number) => {
+export const formatTime = (timestamp: number, timeZone: string) => {
   const date = new Date(timestamp * 1000);
-  const hours = date.getUTCHours();
-  const mins = date.getUTCMinutes();
-
-  const hour = String(hours).padStart(2, '0');
-  const minute = String(mins).padStart(2, '0');
-  return `${hour}:${minute}`;
-};
-
-export const formatDate = (timestamp: number) => {
-  const date = new Date(timestamp * 1000);
-
-  const utcDay = date.getDate();
-  const utcMonth = date.getMonth() + 1;
-  const utcYear = date.getFullYear();
-  const hours = date.getUTCHours();
-  const mins = date.getUTCMinutes();
-
-  const utcDayName = date.toLocaleDateString('en-US', {
-    weekday: 'short',
+  const formatter = new Intl.DateTimeFormat('en', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: timeZone,
   });
 
-  // Format the date components with leading zeros if needed
-  const day = String(utcDay).padStart(2, '0');
-  const month = String(utcMonth).padStart(2, '0');
-  const hour = String(hours).padStart(2, '0');
-  const minute = String(mins).padStart(2, '0');
-  const year = utcYear;
+  return formatter.format(date);
+};
 
-  // Return the formatted date string
-  return `${utcDayName}, ${day}.${month}.${year}, ${hour}:${minute}`;
+export const formatDate = (timestamp: number, timeZone: string) => {
+  const date = new Date(timestamp * 1000);
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: timeZone,
+  });
+
+  return formatter.format(date);
 };
 
 export const roundOff = (value: number) => value.toFixed(0);

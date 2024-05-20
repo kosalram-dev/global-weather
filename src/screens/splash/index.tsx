@@ -15,7 +15,7 @@ const Splash: FunctionComponent = () => {
 
   return (
     <View className="flex-1 items-center justify-center bg-white">
-      <Text className="font-semibold text-primary text-xl">Global</Text>
+      <Text className="font-semibold text-primary text-3xl">Global</Text>
     </View>
   );
 };

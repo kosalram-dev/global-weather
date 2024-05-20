@@ -151,3 +151,13 @@ export type TInfoChip = {
   key: keyof Current;
   unit: string;
 };
+
+export type TLocation = {
+  id: number;
+  name: string;
+  region: string;
+  country: string;
+  lat: number;
+  lon: number;
+  url: string;
+};

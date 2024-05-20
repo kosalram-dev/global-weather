@@ -1,4 +1,4 @@
-import React, {FunctionComponent, useCallback} from 'react';
+import React, {FunctionComponent, useCallback, useState} from 'react';
 import {StatusBar} from 'react-native';
 
 import {Header, InfoChip, ForecastTile} from '../../components';
@@ -10,8 +10,9 @@ import {
   ImageBackground,
 } from '../../components/rn-styled';
 import useWeather, {DEFAULT_FORECAST_HOUR} from '../../hooks/useWeather';
+import useDebounce from '../../hooks/useDebounce';
 import {formatDate, roundOff} from '../../helpers/datetime-formatter';
-import {TInfoChip} from '../../helpers/types';
+import {TInfoChip, TLocation} from '../../helpers/types';
 
 import ClearSky from '../../assets/clear_sky.jpg';
 import CloudSky from '../../assets/cloudy_sky.jpg';
@@ -20,6 +21,8 @@ import Rain from '../../assets/rain.jpg';
 import Humidity from '../../assets/humidity.png';
 import Wind from '../../assets/wind.png';
 import Precipitation from '../../assets/weather.png';
+import useLocation from '../../hooks/useLocation';
+import LocationSelector from './location-selector';
 
 const infoChips: TInfoChip[] = [
   {
@@ -45,29 +48,44 @@ const infoChips: TInfoChip[] = [
   },
 ];
 
-const Home: FunctionComponent = () => {
-  const {location, current, forecast} = useWeather('London');
+const getBackgroundImage = (value?: string) => {
+  if (value) {
+    value = value.toLowerCase();
+  }
+  switch (value) {
+    case 'overcast':
+    case 'partly cloudy':
+      return CloudSky;
+    case 'moderate rain at times':
+    case 'mist':
+    case 'light rain':
+    case 'light rain shower':
+    case 'patchy rain nearby':
+    case 'rain':
+      return Rain;
+    case 'clear':
+    case 'sunny':
+    default:
+      return ClearSky;
+  }
+};
 
-  const getBackgroundImage = (value?: string) => {
-    if (value) {
-      value = value.toLowerCase();
-    }
-    switch (value) {
-      case 'overcast':
-      case 'partly cloudy':
-        return CloudSky;
-      case 'moderate rain at times':
-      case 'mist':
-      case 'light rain':
-      case 'light rain shower':
-      case 'patchy rain nearby':
-      case 'rain':
-        return Rain;
-      case 'clear':
-      case 'sunny':
-      default:
-        return ClearSky;
-    }
+const Home: FunctionComponent = () => {
+  const [toggleSearch, setToggleSearch] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const {location, current, forecast, getWeatherForecast} = useWeather();
+  const {locations, reset: resetLocations} = useLocation(debouncedSearchTerm);
+
+  const handleLocation = (data: TLocation) => {
+    getWeatherForecast(data.name);
+    setToggleSearch(false);
+    resetLocations();
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
   };
 
   const getMaxAndMinTempOfDay = useCallback(() => {
@@ -111,12 +129,25 @@ const Home: FunctionComponent = () => {
       />
       <SafeAreaView className="flex-1 flex-col">
         <View className="h-2/3">
-          <Header
-            title={location?.name || ''}
-            subtitle={location?.country || ''}
-          />
+          <View className="mx-4">
+            <Header
+              handleSearch={handleSearch}
+              toggleSearch={toggleSearch}
+              setToggleSearch={setToggleSearch}
+            />
+          </View>
           {current && (
             <View className={'flex-1 items-center'}>
+              <View className="items-center justify-between h-20 w-full flex-row px-4">
+                <View className="flex-1 items-center justify-center">
+                  <Text className="text-xl font-bold text-black text-center">
+                    {location?.name}
+                  </Text>
+                  <Text className="text-xs font-normal text-black text-center">
+                    {location?.country}
+                  </Text>
+                </View>
+              </View>
               <View className="flex-1 items-center justify-center">
                 <Text className="font-medium text-black text-6xl align-middle text-center">
                   {`${roundOff(current.temp_c)} °C`}
@@ -152,21 +183,31 @@ const Home: FunctionComponent = () => {
               </View>
             </View>
           )}
+          {toggleSearch && locations && locations.length > 0 && (
+            <LocationSelector
+              locations={locations}
+              handleLocation={handleLocation}
+            />
+          )}
         </View>
         <View className="h-1/3 flex-col items-center justify-center">
           <View className="flex-1 items-center justify-center">
             {location && location.localtime_epoch && (
               <Text className="font-semibold text-black text-lg align-middle text-center">
-                {formatDate(location.localtime_epoch)}
+                {formatDate(location.localtime_epoch, location.tz_id)}
               </Text>
             )}
           </View>
-          {forecast && forecast.forecastday.length > 0 && (
+          {location && forecast && forecast.forecastday.length > 0 && (
             <>
               <Text className="text-sm">5-hour forecast</Text>
               <View className="flex-1 flex-row items-center justify-evenly">
                 {getForecastHours().map(hour => (
-                  <ForecastTile key={`hour_${hour.time_epoch}`} hour={hour} />
+                  <ForecastTile
+                    key={`hour_${hour.time_epoch}`}
+                    hour={hour}
+                    timezone={location.tz_id}
+                  />
                 ))}
               </View>
             </>
